@@ -3,12 +3,14 @@ var app = express();
 var bodyParser = require('body-parser');
 const axios = require('axios')
 const process = require('process')
+const momentTimezone = require('moment-timezone');
+const emoji = require('node-emoji')
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({
     extended: true
 })); // for parsing application/x-www-form-urlencoded
-console.log(process.env);
+
 //This is the route the API will call
 app.post('/new-message', function(req, res) {
     const {message} = req.body
@@ -16,12 +18,13 @@ app.post('/new-message', function(req, res) {
 
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
-    if (!message || !message.text.toLowerCase().includes('que dia é hoje?') ) {
+    if (!message || !message.text.toLowerCase().includes('que dia é hoje?')|| !message.text.toLowerCase().includes('que dia é hoje ?') ) {
         // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
         // return res.end()
-        chatMessage = 'Não tem';
+        let dataTeste = momentTimezone.tz( new Date(), "America/Sao_Paulo").format("HH:mm:ss" );
+        chatMessage = `Agora são: ${dataTeste} e existe uma variável de TZ setada para: ${process.env.TZ} e outra para ${process.env.NODE_ENV}`;
     }else{
-        let weekDay = new Date().getDay();
+        let weekDay = momentTimezone.tz( new Date(), "America/Sao_Paulo").day();
 
         switch(weekDay){
             case 0:
@@ -40,7 +43,7 @@ app.post('/new-message', function(req, res) {
                 chatMessage = 'Hoje é quinta, que é quase sexta';
                 break;
             case 5:
-                chatMessage = 'Hoje é SEXTA, dia de MALDADE!:smiling_imp:';
+                chatMessage = 'Hoje é SEXTA, dia de MALDADE!\u{1F608}';
                 break;
             case 6:
                 chatMessage = 'Hoje é sábado, dia da catchaça';
